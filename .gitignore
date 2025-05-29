@@ -1,0 +1,19 @@
+# Ignore specific files
+file.txt
+*.log
+
+# Ignore directories
+node_modules/
+build/
+
+# Ignore env files
+.env
+.env*
+configs.env
+.replit
+
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*$pyc.class
+
