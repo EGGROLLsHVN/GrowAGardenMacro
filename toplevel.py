@@ -129,8 +129,8 @@ class Newlv():
             "BloodBananaSeed(Bm)": False,
             "MoonMelonSeed(Bm)": False,
             "StarCaller(Bm)": False,
-            "BloodKiwi(Bm)": False,
             "BloodHedgehog(Bm)": False,
+            "BloodKiwi(Bm)": False,
             "BloodOwl(Bm)": False,
 
             # Twilight Shop
@@ -306,7 +306,7 @@ class Newlv():
 
                 # NOTE: Edit upon newer updates
                 bloodItems = ["MysteriousCrate(Bm)", "NightEgg(Bm)", "NightSeedPack(Bm)", "BloodBananaSeed(Bm)", "MoonMelonSeed(Bm)", 
-                            "StarCaller(Bm)", "BloodKiwi(Bm)", "BloodHedgehog(Bm)", "BloodOwl(Bm)"]
+                            "StarCaller(Bm)", "BloodHedgehog(Bm)", "BloodKiwi(Bm)", "BloodOwl(Bm)"]
 
                 for i, bItems in enumerate(bloodItems):
                     row = i // self.bloodMC

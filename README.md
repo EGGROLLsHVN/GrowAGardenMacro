@@ -19,6 +19,8 @@
 ## 📖 Description  
 An automated program for the roblox game "Grow A Garden" that easily buys items from all shops every reset (regular seeds, eggs, gears, events). Saves players time on manual grinding. 
 
+- Only works for 2560x1600 and 1920x1080 resolution
+
 ### Setup  
 - ESC >> Settings >> UI Navigation Toggle >> ON
 - Recall wrench in hotbar slot 2

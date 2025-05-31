@@ -178,28 +178,41 @@ class Macro():
                 self.twilightShop()
                 self.exitShopGui()
 
+    # TODO: Might need to update confidence levels
     def eventShopCheck(self):
+        bestMatch = None
+        bestConfidence = 0
+
         print("Checking for event shops")
         bloodmoonPath = r"images\bloodmoon.png"
-        bloodmoonMatches = self.locateImage(bloodmoonPath, confidence=0.9)
+        bloodmoonMatches = self.locateImage(bloodmoonPath, confidence=0.6) # 0.6 works for bloodmoon in 2560 x 1600
+        bloodmoonPath1920x1080 = r"images\bloodmoon1920x1080.png"
+        bloodmoonMatches1920x1080 = self.locateImage(bloodmoonPath1920x1080, confidence=0.7)
 
         twilightPath = r"images\twilight.png"
-        twilightMatches = self.locateImage(twilightPath, confidence=0.9)
+        twilightMatches = self.locateImage(twilightPath, confidence=0.9) # 0.9 works for twilight in 2560 x 1600
+        twilightPath1920x1080 = r"images\twilight1920x1080.png"
+        twilightMatches1920x1080 = self.locateImage(twilightPath1920x1080, confidence=0.7)
 
-        if len(twilightMatches) > 0:
-            self.eventDetector["Twilight"] = True
-            # print("Setting T as True")
-        else:
-            self.eventDetector["Twilight"] = False
-            # print("Setting T as False")
-
-        if len(bloodmoonMatches) > 0:
+        if len(bloodmoonMatches) > 0 or len(bloodmoonMatches1920x1080) > 0:
             self.eventDetector["Bloodmoon"] = True
-            # print("Setting B as True")
+            if len(bloodmoonMatches) > 0:
+                print("2560x1600 Bloodmoon detected")
+            else:
+                print("1920x1080 Bloodmoon detected")
+   
         else:
             self.eventDetector["Bloodmoon"] = False
-            # print("Setting B as False")
 
+        if len(twilightMatches) > 0 or len(twilightMatches1920x1080):
+            self.eventDetector["Twilight"] = True
+            if len(twilightMatches) > 0:
+                print("2560x1600 Twilight detected")
+            else:
+                print("1920x1080 Twilight detected")
+        else:
+            self.eventDetector["Twilight"] = False
+            
     def regSeedMacro(self): 
         if not self.is_running:
             return
@@ -377,12 +390,27 @@ class Macro():
         self.safeSleep(1)
 
         if not self.is_running: return
-        cancelBtnPath = r"images\cancelButton.png"
-        matches = self.locateImage(cancelBtnPath)
+        cancelBtnPath2560x1600 = r"images\cancelButton.png"
+        cancelBtnPath1920x1080 = r"images\cancelButton1920x1080.png"
+        matches2560x1600 = self.locateImage(cancelBtnPath2560x1600)
+        matches1920x1080 = self.locateImage(cancelBtnPath1920x1080, confidence=0.7)
 
-        bestMatch = max(matches, key=lambda m: m["confidence"])
+        bestMatch = None
+        bestConfidence = 0
 
         # Click the center of the button for better accuracy
+        if matches2560x1600:
+             currentBest = max(matches2560x1600, key=lambda m: m["confidence"])
+             if currentBest["confidence"] > bestConfidence:
+                 bestMatch = currentBest
+                 bestConfidence = currentBest["confidence"]
+
+        if matches1920x1080:
+            currentBest = max(matches1920x1080, key=lambda m: m["confidence"])
+            if currentBest["confidence"] > bestConfidence:
+                 bestMatch = currentBest
+                 bestConfidence = currentBest["confidence"]
+
         x = bestMatch["x"] + bestMatch["width"] // 2
         y = bestMatch["y"] + bestMatch["height"] // 2
 
