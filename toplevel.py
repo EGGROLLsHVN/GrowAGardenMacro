@@ -22,6 +22,7 @@ class Newlv():
         self.eggMaxC=1
         self.bloodMC=1
         self.twilightMC=1
+        self.beeShopMC=1
 
         # NOTE: Edit upon newer updates
         self.shopCategories = {
@@ -59,25 +60,18 @@ class Newlv():
             "FavoriteTool": "GearShop",
             "HarvestTool": "GearShop",
 
-            # Bloodmoon Shop
-            "MysteriousCrate(Bm)": "BloodMoonShop",
-            "NightEgg(Bm)": "BloodMoonShop",
-            "NightSeedPack(Bm)": "BloodMoonShop",
-            "BloodBananaSeed(Bm)": "BloodMoonShop",
-            "MoonMelonSeed(Bm)": "BloodMoonShop",
-            "StarCaller(Bm)": "BloodMoonShop",
-            "BloodKiwi(Bm)": "BloodMoonShop",
-            "BloodHedgehog(Bm)": "BloodMoonShop",
-            "BloodOwl(Bm)": "BloodMoonShop",
-
-            # Twilight Shop
-            "NightEgg(Tl)": "TwilightShop",
-            "NightSeedPack(Tl)": "TwilightShop",
-            "TwilightCrate(Tl)": "TwilightShop",
-            "StarCaller(Tl)": "TwilightShop",
-            "MoonCat(Tl)": "TwilightShop",
-            "Celestiberry(Tl)": "TwilightShop",
-            "MoonMango(Tl)": "TwilightShop",
+            # Bee Shop:
+            "FlowerSeedPack": "BeeShop",
+            "NectarineSeed": "BeeShop",
+            "HiveFruitSeed": "BeeShop",
+            "HoneySprinkler": "BeeShop",
+            "BeeEgg": "BeeShop",
+            "BeeCrate": "BeeShop",
+            "HoneyComb":"BeeShop",
+            "BeeChair": "BeeShop",
+            "HoneyTorch": "BeeShop",
+            "HoneyWalkway": "BeeShop",
+            "CompressHoney": "BeeShop",
 
             # Egg Shop
             "All": "EggShop",
@@ -121,28 +115,20 @@ class Newlv():
             "FavoriteTool": False,
             "HarvestTool": False,
 
-            # Bloodmoon Shop:
-            "BloodMoonShop": 0,
-            "MysteriousCrate(Bm)": False,
-            "NightEgg(Bm)": False,
-            "NightSeedPack(Bm)": False,
-            "BloodBananaSeed(Bm)": False,
-            "MoonMelonSeed(Bm)": False,
-            "StarCaller(Bm)": False,
-            "BloodHedgehog(Bm)": False,
-            "BloodKiwi(Bm)": False,
-            "BloodOwl(Bm)": False,
-
-            # Twilight Shop
-            "TwilightShop": 0,
-            "NightEgg(Tl)": False,
-            "NightSeedPack(Tl)": False,
-            "TwilightCrate(Tl)": False,
-            "StarCaller(Tl)": False,
-            "MoonCat(Tl)": False,
-            "Celestiberry(Tl)": False,
-            "MoonMango(Tl)": False,
-
+            # Bee Shop:
+            "BeeShop": 0,
+            "FlowerSeedPack": False,
+            "NectarineSeed": False,
+            "HiveFruitSeed": False,
+            "HoneySprinkler": False,
+            "BeeEgg": False,
+            "BeeCrate": False, 
+            "HoneyComb": False,
+            "BeeChair": False,
+            "HoneyTorch": False,
+            "HoneyWalkway": False,
+            "CompressHoney": False,
+            
             # Eggshop:
             "EggShop": 0,
             "All": False
@@ -182,8 +168,7 @@ class Newlv():
             self.saveOptions()
 
     def recalculateCategory(self):
-        for category in ["SeedShop", "GearShop", "BloodMoonShop", "TwilightShop", 
-                         "EggShop"]:
+        for category in ["SeedShop", "GearShop", "BeeShop", "EggShop"]:
             self.seeds[category] = 0
 
         for seed, category in self.shopCategories.items():
@@ -266,9 +251,9 @@ class Newlv():
         shopBook.add(eventShop, text="Events")
         shopBook.add(startTab, text="Start Macro")
 
-        # Event shop dropdown combo menu
+        # Event shop dropdown combo menu NOTE: Change this for event things
         eventsVar = tk.StringVar()
-        events = ["Bloodmoon", "Twilight"]
+        events = ["BeeShop", "Bloodmoon", "Twilight"]
 
         
         # Configure the Combobox style
@@ -299,18 +284,18 @@ class Newlv():
 
         # TODO: Changes combobox
         def eventMenuChange(select):
-            if select == "Bloodmoon":
-                # Blood Moon Shop
-                for col in range(self.bloodMC):
+            # Bee Shop
+            if select == "BeeShop":
+                for col in range(self.beeShopMC):
                     eventShopGrid.grid_columnconfigure(col, weight=1)
 
                 # NOTE: Edit upon newer updates
-                bloodItems = ["MysteriousCrate(Bm)", "NightEgg(Bm)", "NightSeedPack(Bm)", "BloodBananaSeed(Bm)", "MoonMelonSeed(Bm)", 
-                            "StarCaller(Bm)", "BloodHedgehog(Bm)", "BloodKiwi(Bm)", "BloodOwl(Bm)"]
-
-                for i, bItems in enumerate(bloodItems):
-                    row = i // self.bloodMC
-                    column = i % self.bloodMC
+                beeshopItems = ["FlowerSeedPack", "NectarineSeed", "HiveFruitSeed", "HoneySprinkler", 
+                                "BeeEgg", "BeeCrate", "HoneyComb", "BeeChair", "HoneyTorch", "HoneyWalkway", "CompressHoney"]
+            
+                for i, bItems in enumerate(beeshopItems):
+                    row = i // self.beeShopMC
+                    column = i % self.beeShopMC
 
                     Checkbutton(
                         eventShopGrid,
@@ -319,45 +304,6 @@ class Newlv():
                         onvalue=True,
                         offvalue=False,
                         command=lambda b=bItems: self.updateSeed(b),
-                        bg="#292928",
-                        fg="white",
-                        selectcolor="#1e1e1e",
-                        activebackground="#292928",
-                        activeforeground="white",
-                        anchor="w",
-                        width=18  # Fixed width for consistent alignment
-                        ).grid(
-                        row=row,
-                        column=column,
-                        sticky="nsew",  # Expand to fill cell
-                        padx=5,
-                        pady=2
-                    )
-
-                # Expanding Rows
-                total_rows = (len(bloodItems) // self.bloodMC) + 1
-                for row in range(total_rows):
-                    eventShopGrid.grid_rowconfigure(row, weight=1)
-
-            if select == "Twilight":
-                # Twilight Shop
-                for col in range(self.bloodMC):
-                    eventShopGrid.grid_columnconfigure(col, weight=1)
-
-                # NOTE: Edit upon newer updates
-                twilightItems = ["NightEgg(Tl)", "NightSeedPack(Tl)", "TwilightCrate(Tl)", "StarCaller(Tl)", "MoonCat(Tl)", "Celestiberry(Tl)", "MoonMango(Tl)"]
-            
-                for i, tItems in enumerate(twilightItems):
-                    row = i // self.twilightMC
-                    column = i % self.twilightMC
-
-                    Checkbutton(
-                        eventShopGrid,
-                        text=tItems,
-                        variable=self.seed_vars[tItems],
-                        onvalue=True,
-                        offvalue=False,
-                        command=lambda t=tItems: self.updateSeed(t),
                         bg="#292928",
                         fg="white",
                         selectcolor="#1e1e1e",
@@ -374,7 +320,7 @@ class Newlv():
                     )
 
                 # Expanding Rows
-                total_rows = (len(twilightItems) // self.twilightMC) + 1
+                total_rows = (len(beeshopItems) // self.beeShopMC) + 1
                 for row in range(total_rows):
                     eventShopGrid.grid_rowconfigure(row, weight=1)
 

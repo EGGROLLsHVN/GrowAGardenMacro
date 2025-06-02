@@ -10,7 +10,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from mss import mss
 
-ctypes.windll.shcore.SetProcessDpiAwareness(2)
+# ctypes.windll.shcore.SetProcessDpiAwareness(2)
 delay = .3
 
 class Macro():
@@ -92,126 +92,196 @@ class Macro():
         if not self.is_running:
             return
         
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")
+        autoit.mouse_click("Left", 1000, 150) # Clicks garden button
         self.safeSleep(0.5)
         pydirectinput.keyDown("i")
         self.safeSleep(2)
         pydirectinput.keyUp("i")
         self.safeSleep(0.3)
         pydirectinput.keyDown("o")
-        self.safeSleep(0.15)
+        self.safeSleep(0.175)
         pydirectinput.keyUp("o")
         self.safeSleep(1)
 
         if self.seedData.get("SeedShop") > 0 and self.is_running:
             self.regSeedMacro()
             self.exitShopGui()
-            autoit.send("\\")
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{ENTER}")
-            self.safeSleep(delay)
-            autoit.send("\\")
+            autoit.mouse_click("Left", 1000, 150) # Clicks garden button
             self.safeSleep(1)
 
         if self.seedData.get("EggShop") > 0 and self.is_running:
             self.eggShopMacro()
-            # autoit.send("\\")
-            # autoit.send("{RIGHT}")
-            # self.safeSleep(delay)
-            # autoit.send("{RIGHT}")
-            # self.safeSleep(delay)
-            # autoit.send("{RIGHT}")
-            # self.safeSleep(delay)
-            # autoit.send("{RIGHT}")
-            # self.safeSleep(delay)
-            # autoit.send("{ENTER}")
-            # self.safeSleep(delay)
-            # autoit.send("\\")
             self.safeSleep(1) 
 
         if self.seedData.get("GearShop") > 0 and self.is_running:
             self.gearShopMacro()
             self.exitShopGui()
-            autoit.send("\\")
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{RIGHT}")
-            self.safeSleep(delay)
-            autoit.send("{ENTER}")
-            self.safeSleep(delay)
-            autoit.send("\\")
+            autoit.mouse_click("Left", 1000, 150) # Clicks garden button
             self.safeSleep(1)
 
-        self.eventShopCheck()
+        # self.eventShopCheck()
         self.eventShopActivate()
 
     def eventShopActivate(self):
-        if self.eventDetector["Bloodmoon"] is True:
-            if self.seedData.get("BloodMoonShop") > 0 and self.is_running:
-                self.bloodMoonShop()
-                self.exitShopGui()
+        # if self.eventDetector["Bloodmoon"] is True:
+        #     if self.seedData.get("BloodMoonShop") > 0 and self.is_running:
+        #         self.bloodMoonShop()
+        #         self.exitShopGui()
 
-        if self.eventDetector["Twilight"] is True:
-            if self.seedData.get("TwilightShop") > 0 and self.is_running:
-                self.twilightShop()
-                self.exitShopGui()
+        # if self.eventDetector["Twilight"] is True:
+        #     if self.seedData.get("TwilightShop") > 0 and self.is_running:
+        #         self.twilightShop()
+        #         self.exitShopGui()
 
-    # TODO: Might need to update confidence levels
-    def eventShopCheck(self):
-        bestMatch = None
-        bestConfidence = 0
+        if self.seedData.get("BeeShop") > 0:
+            self.beeShop()
+            self.exitShopGui()
 
-        print("Checking for event shops")
-        bloodmoonPath = r"images\bloodmoon.png"
-        bloodmoonMatches = self.locateImage(bloodmoonPath, confidence=0.6) # 0.6 works for bloodmoon in 2560 x 1600
-        bloodmoonPath1920x1080 = r"images\bloodmoon1920x1080.png"
-        bloodmoonMatches1920x1080 = self.locateImage(bloodmoonPath1920x1080, confidence=0.7)
+            if self.seedData.get("CompressHoney", False) and self.is_running:
+                pydirectinput.keyDown("w")
+                self.safeSleep(.2)
+                pydirectinput.keyUp("w")
+                self.safeSleep(.75)
+                pydirectinput.keyDown("d")
+                self.safeSleep(.25)
+                pydirectinput.keyUp("d")
+                self.safeSleep(.75)
 
-        twilightPath = r"images\twilight.png"
-        twilightMatches = self.locateImage(twilightPath, confidence=0.9) # 0.9 works for twilight in 2560 x 1600
-        twilightPath1920x1080 = r"images\twilight1920x1080.png"
-        twilightMatches1920x1080 = self.locateImage(twilightPath1920x1080, confidence=0.7)
+                autoit.send("~")
+                self.safeSleep(delay=.5)
+                autoit.mouse_click("Left", 1350, 560, 2) # Clicks inventory search and types in poll for pollinated
+                self.safeSleep(delay=.5)
+                autoit.send("p")
+                self.safeSleep(delay=.5)
+                autoit.send("o")
+                self.safeSleep(delay=.5)
+                autoit.send("l")
+                self.safeSleep(delay=.5)
+                autoit.send("l")
+                self.safeSleep(delay=.5)
+                autoit.mouse_click("Left", 600, 615, 1) # Selects first plant slot in inventory 
+                self.safeSleep(delay=.5)
+                autoit.send("e")
+                self.safeSleep(delay=.5)
+                autoit.send("e")
+                self.safeSleep(delay=.5)
+                autoit.send("e")
+                self.safeSleep(delay=.5)
+                autoit.send("e")
+                self.safeSleep(delay=.5)
+                autoit.send("~")
 
-        if len(bloodmoonMatches) > 0 or len(bloodmoonMatches1920x1080) > 0:
-            self.eventDetector["Bloodmoon"] = True
-            if len(bloodmoonMatches) > 0:
-                print("2560x1600 Bloodmoon detected")
-            else:
-                print("1920x1080 Bloodmoon detected")
-   
-        else:
-            self.eventDetector["Bloodmoon"] = False
+    # TODO: Might need to update confidence levels create be event
+    # def eventShopCheck(self):
 
-        if len(twilightMatches) > 0 or len(twilightMatches1920x1080):
-            self.eventDetector["Twilight"] = True
-            if len(twilightMatches) > 0:
-                print("2560x1600 Twilight detected")
-            else:
-                print("1920x1080 Twilight detected")
-        else:
-            self.eventDetector["Twilight"] = False
+    def beeShop(self): # 1200 , 520
+        if not self.is_running:
+            return
+        
+        autoit.send("\\")
+        autoit.send("{RIGHT}")
+        self.safeSleep(delay)
+        autoit.send("{DOWN}")
+        self.safeSleep(delay)
+        autoit.send("{ENTER}")
+        self.safeSleep(delay)
+        autoit.send("\\")
+        self.safeSleep(2)
+
+        autoit.send("d")
+        autoit.send("d")
+        autoit.send("d")
+
+        pydirectinput.keyDown("w")
+        self.safeSleep(.7)
+        pydirectinput.keyUp("w")
+        self.safeSleep(.4)
+
+        pydirectinput.keyDown("d")
+        self.safeSleep(9.1)
+        pydirectinput.keyUp("d")
+        self.safeSleep(.2)
+
+        pydirectinput.keyDown("s")
+        self.safeSleep(.15)
+        pydirectinput.keyUp("s")
+        self.safeSleep(.2)
+
+        autoit.send("e")
+        self.safeSleep(3)
+        autoit.mouse_click("Left", 1200, 520, 2)
+        self.safeSleep(1.5)
+
+        if self.seedData.get("FlowerSeedPack", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(2)
+            self.shopBuy()
+
+        #
+        if self.seedData.get("NectarineSeed", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(3)
+            self.shopBuy()
+
+        #
+        if self.seedData.get("HiveFruitSeed", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(4)
+            self.shopBuy()
+
+        #
+        if self.seedData.get("HoneySprinkler", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(5)
+            self.shopBuy()
+
+        #
+        if self.seedData.get("BeeEgg", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(6)
+            self.shopBuy()
+        
+        #
+        if self.seedData.get("BeeCrate", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(7)
+            self.shopBuy()
+
+        # 
+        if self.seedData.get("HoneyComb", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(8)
+            self.shopBuy()
+
+        # 
+        if self.seedData.get("BeeChair", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(9)
+            self.shopBuy()
+
+        #
+        if self.seedData.get("HoneyTorch", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(10)
+            self.shopBuy()
+
+        # 
+        if self.seedData.get("HoneyWalkway", False) and self.is_running:
+            autoit.send("\\")
+            autoit.send("{RIGHT}")
+            self.moveDown(11)
+            self.shopBuy()
+
+
             
     def regSeedMacro(self): 
         if not self.is_running:
@@ -379,7 +449,7 @@ class Macro():
         pydirectinput.keyUp("d")
         self.safeSleep(.4)
 
-        # The p2w sign 
+        # The p2w sign TODO: Edit it for 1920 x 1080 100% resolution
         pydirectinput.keyDown("w")
         self.safeSleep(1)
         pydirectinput.keyUp("w")
@@ -388,34 +458,22 @@ class Macro():
         if not self.is_running: return
         autoit.send("e")
         self.safeSleep(1)
+        autoit.mouse_click("Left", 850, 680)
 
-        if not self.is_running: return
-        cancelBtnPath2560x1600 = r"images\cancelButton.png"
-        cancelBtnPath1920x1080 = r"images\cancelButton1920x1080.png"
-        matches2560x1600 = self.locateImage(cancelBtnPath2560x1600)
-        matches1920x1080 = self.locateImage(cancelBtnPath1920x1080, confidence=0.7)
+        # if not self.is_running: return
+        # cancelBtnPath1920x1080 = r"images\cancelButton1920x1080.png"
+        # matches = self.locateImage(cancelBtnPath1920x1080)
 
-        bestMatch = None
-        bestConfidence = 0
+        # if not self.is_running: return
+        # # Click the center of the button for better accuracy
+        # bestMatch = max(matches, key=lambda m: m["confidence"]) 
 
-        # Click the center of the button for better accuracy
-        if matches2560x1600:
-             currentBest = max(matches2560x1600, key=lambda m: m["confidence"])
-             if currentBest["confidence"] > bestConfidence:
-                 bestMatch = currentBest
-                 bestConfidence = currentBest["confidence"]
+        # # Click the center of the button for better accuracy
+        # x = bestMatch["x"] + bestMatch["width"] // 2
+        # y = bestMatch["y"] + bestMatch["height"] // 2
 
-        if matches1920x1080:
-            currentBest = max(matches1920x1080, key=lambda m: m["confidence"])
-            if currentBest["confidence"] > bestConfidence:
-                 bestMatch = currentBest
-                 bestConfidence = currentBest["confidence"]
-
-        x = bestMatch["x"] + bestMatch["width"] // 2
-        y = bestMatch["y"] + bestMatch["height"] // 2
-
-        autoit.mouse_click("left", x, y, 1)   
-        self.safeSleep(.2)
+        # autoit.mouse_click("left", x, y, 1)   
+        # self.safeSleep(.2)
 
         # Egg 1
         pydirectinput.keyDown("s")
@@ -428,20 +486,8 @@ class Macro():
         self.safeSleep(.6)
 
         if not self.is_running: return # Buy
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{DOWN}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")
+        autoit.mouse_click("Left", 900, 670) 
+        autoit.mouse_click("Left", 1300, 360) 
         self.safeSleep(.2)    
 
         # Egg 2
@@ -455,20 +501,8 @@ class Macro():
         self.safeSleep(.6)
         
         if not self.is_running: return  # Buy
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{DOWN}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")
+        autoit.mouse_click("Left", 900, 670) 
+        autoit.mouse_click("Left", 1300, 360) 
         self.safeSleep(.2) 
 
         # Egg 3
@@ -482,20 +516,8 @@ class Macro():
         self.safeSleep(.6)
         
         if not self.is_running: return  # Buy
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{DOWN}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")
+        autoit.mouse_click("Left", 900, 670) 
+        autoit.mouse_click("Left", 1300, 360) 
         self.safeSleep(.2)
 
     def gearShopMacro(self):
@@ -507,28 +529,13 @@ class Macro():
         autoit.send("d")
 
         autoit.send("2") 
-        # autoit.mouse_click("left", 940, 1480)
         self.safeSleep(2)
         autoit.mouse_click("left", 800, 700)
-        self.safeSleep(1)
+        self.safeSleep(2)
         autoit.send("e")
-        self.safeSleep(1.5)
-
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{DOWN}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")   
-        self.safeSleep(1.5)
+        self.safeSleep(2)
+        autoit.mouse_click("Left", 1270, 500)
+        self.safeSleep(1.2)
     
         # To close the buy (1770, 400)
         if self.seedData.get("WateringCan", False) and self.is_running:
@@ -766,7 +773,7 @@ class Macro():
         if not self.is_running:
             return
 
-        self.safeSleep(delay)
+        self.safeSleep(delay) 
         autoit.send("{ENTER}")
         self.safeSleep(.75)
         autoit.send("{DOWN}")
@@ -781,31 +788,34 @@ class Macro():
         autoit.send("\\")
         autoit.send("\\")
         autoit.send("\\")
+        self.safeSleep(0.5)
     
     def moveDown(self, number):
         for i in range(number):
-            self.safeSleep(.05)
+            self.safeSleep(.075 )
             autoit.send("{DOWN}")
 
     def exitShopGui(self): 
         self.safeSleep(delay)
-        autoit.send("\\")
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{RIGHT}")
-        self.safeSleep(delay)
-        autoit.send("{DOWN}")
-        self.safeSleep(delay)
-        autoit.send("{ENTER}")
-        self.safeSleep(delay)
-        autoit.send("\\")
-        self.safeSleep(delay)
+        autoit.mouse_click("Left", 1300, 290) # 1300, 290, 1280, 275
+        # autoit.send("\\")
+        # autoit.send("{RIGHT}")
+        # autoit.send("{RIGHT}")
+        # self.safeSleep(delay)
+        # autoit.send("{RIGHT}")
+        # self.safeSleep(delay)
+        # autoit.send("{RIGHT}")
+        # self.safeSleep(delay)
+        # autoit.send("{RIGHT}")
+        # self.safeSleep(delay)
+        # autoit.send("{RIGHT}")
+        # self.safeSleep(delay)
+        # autoit.send("{DOWN}")
+        # self.safeSleep(delay)
+        # autoit.send("{ENTER}")
+        # self.safeSleep(delay)
+        # autoit.send("\\")
+        self.safeSleep(1)
 
     def locateImage(self, imagePath, confidence=0.5):
         template = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
