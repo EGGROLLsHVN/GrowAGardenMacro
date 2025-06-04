@@ -10,12 +10,10 @@ import numpy as np
 from datetime import datetime, timedelta
 from mss import mss
 
-# ctypes.windll.shcore.SetProcessDpiAwareness(2)
 delay = .3
 
 class Macro():
     def __init__(self, seedData, runCount):
-       
         self.seedData = seedData  # Store the seeds dictionary
         self.runCount = runCount
         self.is_running = False
@@ -29,27 +27,41 @@ class Macro():
         }
 
     def start(self):
-        if not self.is_running:
-            self.is_running = True
-            self.thread = threading.Thread(target=self.mainLoop, daemon=True)
-            self.checkStopThread = threading.Thread(target=self.checkStop, daemon=True)
-            self.checkStopThread.start()
-            autoit.win_activate("Roblox")
-            autoit.win_activate("Roblox")
-            self.thread.start()
+            if self.is_running:
+                return
+            
+            if not self.is_running:
+                self.is_running = True
+                self.thread = threading.Thread(target=self.mainLoop, daemon=True)
+                self.checkStopThread = threading.Thread(target=self.checkStop, daemon=True)
+                self.checkStopThread.start()
+                autoit.win_activate("Roblox")
+                autoit.win_activate("Roblox")
+                self.thread.start()
 
     def checkStop(self):
         while self.is_running:
             if keyboard.is_pressed("ctrl+2"):
                 print("Ctrl+2 Pressed")
                 self.stop()
-                break
-            time.sleep(.001)  # Check every second
+                break  
+        time.sleep(.05)  # Check every second
 
     def stop(self):
         if self.thread and self.thread.is_alive():
+            print("Macro Stopped")
             self.is_running = False
+            keyboard.unhook_all()
+            self.cleanup()
             self.thread.join(timeout=.5)
+    
+    def cleanup(self):
+        releaseKeys = ['w', 'a', 's', 'd', 'i', 'o', 'e']  # Keys used in the macro
+        for key in releaseKeys:
+            try:
+                pydirectinput.keyUp(key)
+            except:
+                pass
             
     # Split time.sleep into smaller intervals so is_running can be checked more often
     def safeSleep(self, delay):
@@ -62,6 +74,7 @@ class Macro():
     def mainLoop(self):
         autoit.win_activate("Roblox")
         while self.is_running:
+            self.cleanup()
             self.runMacroCycle()
             self.waitUntilNextInterval()
             time.sleep(0.5)
@@ -99,7 +112,7 @@ class Macro():
         pydirectinput.keyUp("i")
         self.safeSleep(0.3)
         pydirectinput.keyDown("o")
-        self.safeSleep(0.175)
+        self.safeSleep(.5)
         pydirectinput.keyUp("o")
         self.safeSleep(1)
 
@@ -139,13 +152,22 @@ class Macro():
 
             if self.seedData.get("CompressHoney", False) and self.is_running:
                 pydirectinput.keyDown("w")
-                self.safeSleep(.2)
+                self.safeSleep(.75)
                 pydirectinput.keyUp("w")
                 self.safeSleep(.75)
                 pydirectinput.keyDown("d")
-                self.safeSleep(.25)
+                self.safeSleep(1)
                 pydirectinput.keyUp("d")
                 self.safeSleep(.75)
+                pydirectinput.keyDown("s")
+                self.safeSleep(.85)     # Pushdown time
+                pydirectinput.keyUp("s")
+                self.safeSleep(.75)
+                pydirectinput.keyDown("a")
+                self.safeSleep(.5)
+                pydirectinput.keyUp("a")
+                self.safeSleep(.75)
+
 
                 autoit.send("~")
                 self.safeSleep(delay=.5)
@@ -177,7 +199,7 @@ class Macro():
     def beeShop(self): # 1200 , 520
         if not self.is_running:
             return
-        
+
         autoit.send("\\")
         autoit.send("{RIGHT}")
         self.safeSleep(delay)
@@ -189,21 +211,22 @@ class Macro():
         self.safeSleep(2)
 
         autoit.send("d")
+        autoit.send("a")
         autoit.send("d")
-        autoit.send("d")
+        autoit.send("a")
 
         pydirectinput.keyDown("w")
-        self.safeSleep(.7)
+        self.safeSleep(.6)
         pydirectinput.keyUp("w")
         self.safeSleep(.4)
 
         pydirectinput.keyDown("d")
-        self.safeSleep(9.1)
+        self.safeSleep(8.3)
         pydirectinput.keyUp("d")
         self.safeSleep(.2)
 
         pydirectinput.keyDown("s")
-        self.safeSleep(.15)
+        self.safeSleep(.075)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
@@ -216,73 +239,211 @@ class Macro():
             autoit.send("\\")
             autoit.send("{RIGHT}")
             self.moveDown(2)
-            self.shopBuy()
 
+            self.safeSleep(delay) 
+            autoit.send("{ENTER}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(delay)
+
+            for i in range(10):
+                autoit.send("{ENTER}")
+
+            autoit.send("{UP}")
+            self.safeSleep(delay)
+            autoit.send("{ENTER}")
+
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
+                
         #
         if self.seedData.get("NectarineSeed", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(3)
-            self.shopBuy()
+            self.moveDown(4)
+            self.eggShopBuy()
+            self.moveUp(1)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
 
         #
         if self.seedData.get("HiveFruitSeed", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(4)
-            self.shopBuy()
+            self.moveDown(5)
+            self.eggShopBuy()
+            self.moveUp(2)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
 
         #
         if self.seedData.get("HoneySprinkler", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(5)
-            self.shopBuy()
-
+            self.moveDown(6)
+            self.eggShopBuy()
+            self.moveUp(3)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
         #
         if self.seedData.get("BeeEgg", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(6)
-            self.shopBuy()
-        
+            self.moveDown(7)
+
+            self.safeSleep(delay) 
+            autoit.send("{ENTER}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(delay)
+
+            for i in range(10):
+                autoit.send("{ENTER}")
+
+            autoit.send("{UP}")
+            self.safeSleep(delay)
+            autoit.send("{ENTER}")
+            self.moveUp(5)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
+            
         #
         if self.seedData.get("BeeCrate", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(7)
-            self.shopBuy()
+            self.moveDown(9)
 
+            self.safeSleep(delay) 
+            autoit.send("{ENTER}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(.1)
+            autoit.send("{DOWN}")
+            self.safeSleep(delay)
+
+            for i in range(10):
+                autoit.send("{ENTER}")
+
+            autoit.send("{UP}")
+            self.safeSleep(delay)
+            autoit.send("{ENTER}")
+            self.moveUp(7)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
         # 
         if self.seedData.get("HoneyComb", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(8)
-            self.shopBuy()
+            self.moveDown(11)
+            self.eggShopBuy()
+            self.moveUp(8)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
 
         # 
         if self.seedData.get("BeeChair", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(9)
-            self.shopBuy()
+            self.moveDown(12)
+            self.eggShopBuy()
+            self.moveUp(9)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
 
         #
         if self.seedData.get("HoneyTorch", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(10)
-            self.shopBuy()
+            self.moveDown(13)
+            self.eggShopBuy()
+            self.moveUp(10)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
 
         # 
         if self.seedData.get("HoneyWalkway", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
-            self.moveDown(11)
-            self.shopBuy()
-
-
-            
+            self.moveDown(14)
+            self.eggShopBuy()
+            self.moveUp(11)
+            autoit.send("{ENTER}")
+            autoit.send("{ENTER}")
+            self.safeSleep(.75)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(.1)
+            autoit.send("\\")
+            self.safeSleep(0.5)
+                
     def regSeedMacro(self): 
         if not self.is_running:
             return
@@ -477,7 +638,7 @@ class Macro():
 
         # Egg 1
         pydirectinput.keyDown("s")
-        self.safeSleep(.1)
+        self.safeSleep(.075)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
@@ -492,7 +653,7 @@ class Macro():
 
         # Egg 2
         pydirectinput.keyDown("s")
-        self.safeSleep(.1)
+        self.safeSleep(.075)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
@@ -507,7 +668,7 @@ class Macro():
 
         # Egg 3
         pydirectinput.keyDown("s")
-        self.safeSleep(.1)
+        self.safeSleep(.075)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
@@ -520,22 +681,24 @@ class Macro():
         autoit.mouse_click("Left", 1300, 360) 
         self.safeSleep(.2)
 
+    # TODO: Fix
     def gearShopMacro(self):
         if not self.is_running:
             return
-        autoit.send("a")
-        autoit.send("d")
-        autoit.send("a")
-        autoit.send("d")
+        # autoit.send("a")
+        # autoit.send("d")
+        # autoit.send("a")
+        # autoit.send("d")
 
-        autoit.send("2") 
+        # autoit.send("2") 
+        autoit.mouse_click("left", 675, 980)
         self.safeSleep(2)
         autoit.mouse_click("left", 800, 700)
         self.safeSleep(2)
         autoit.send("e")
         self.safeSleep(2)
-        autoit.mouse_click("Left", 1270, 500)
-        self.safeSleep(1.2)
+        autoit.mouse_click("Left", 1150, 510)
+        self.safeSleep(1.5)
     
         # To close the buy (1770, 400)
         if self.seedData.get("WateringCan", False) and self.is_running:
@@ -544,21 +707,21 @@ class Macro():
             self.moveDown(2)
             self.shopBuy()
 
-        # Scrolls y + 90
+        # 
         if self.seedData.get("Trowel", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
             self.moveDown(3)
             self.shopBuy()
 
-        # Scrolls y + 90
+        # TODO: Fix this doesnt work for some reason
         if self.seedData.get("RecallWrench", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
             self.moveDown(4)
             self.shopBuy()
 
-        # Scrolls y + 90
+        #
         if self.seedData.get("BasicSprinkler", False) and self.is_running:
             autoit.send("\\")
             autoit.send("{RIGHT}")
@@ -780,24 +943,57 @@ class Macro():
         self.safeSleep(delay)
         for i in range(30):
             autoit.send("{ENTER}")
-            self.safeSleep(.05)
+            # self.safeSleep(.01)
         autoit.send("{UP}")
         self.safeSleep(delay)
         autoit.send("{ENTER}")
         self.safeSleep(.75)
         autoit.send("\\")
+        self.safeSleep(.1)
         autoit.send("\\")
+        self.safeSleep(.1)
         autoit.send("\\")
         self.safeSleep(0.5)
-    
-    def moveDown(self, number):
+
+    def eggShopBuy(self):
+        if not self.is_running:
+            return
+
+        self.safeSleep(delay) 
+        autoit.send("{ENTER}")
+        self.safeSleep(.75)
+        autoit.send("{DOWN}")
+        self.safeSleep(delay)
+        for i in range(10):
+            autoit.send("{ENTER}")
+            # self.safeSleep(.01)
+        autoit.send("{UP}")
+        self.safeSleep(delay)
+        autoit.send("{ENTER}")
+        self.safeSleep(.75)
+
+    def moveUp(self, number):
+        if not self.is_running:
+            return
+        
         for i in range(number):
-            self.safeSleep(.075 )
+            self.safeSleep(.07)
+            autoit.send("{UP}")
+        
+    def moveDown(self, number):
+        if not self.is_running:
+            return
+        
+        for i in range(number):
+            self.safeSleep(.05)
             autoit.send("{DOWN}")
 
     def exitShopGui(self): 
+        if not self.is_running:
+            return
+        
         self.safeSleep(delay)
-        autoit.mouse_click("Left", 1300, 290) # 1300, 290, 1280, 275
+        autoit.mouse_click("Left", 1280, 280) # 1300, 290, 1280, 275
         # autoit.send("\\")
         # autoit.send("{RIGHT}")
         # autoit.send("{RIGHT}")
@@ -840,9 +1036,12 @@ class Macro():
         return matches
         
     def switchTabs(self):
-            keyboard.press_and_release("alt + shift + tab")
-            self.safeSleep(0.5)
-            print("Switched to next tab")
+        if not self.is_running:
+            return
+    
+        keyboard.press_and_release("alt + shift + tab")
+        self.safeSleep(0.5)
+        print("Switched to next tab")
 
     # Calculates time based on local time, or time zone in intervals of 5
     def waitUntilNextInterval(self):
@@ -850,25 +1049,18 @@ class Macro():
             return
 
         now = datetime.now(self.est) # now = datetime.now(self.est)
-
         minutesPast = now.minute % 5
-        secondsPast = now.second + now.microsecond/1_000_000
 
-        if minutesPast == 4 or (minutesPast == 0 and now.second < 60):
+        if minutesPast >= 4:
+            minutesToWait = (5 - minutesPast) % 5 # Wait until next 5 minutes
+            nextRun = now.replace(second=0, microsecond=0) + timedelta(minutes=minutesToWait)
+            waitSeconds = max(0, (nextRun - now).total_seconds())
+
+            print(f"Current ET: {now.strftime('%H:%M:%S')}")
+            print(f"Next run at: {nextRun.strftime('%H:%M:%S')}")
+            print(f"Waiting {waitSeconds:.1f} seconds")
+
+            self.safeSleep(waitSeconds)
+
+        else:
             return
-        
-        minutesToWait = (4 - minutesPast) % 5
-        nextRun = now.replace(second=0, microsecond=0) + timedelta(minutes=minutesToWait)
-        wait_seconds = (nextRun - now).total_seconds()
-
-        print(f"Current ET: {now.strftime('%H:%M:%S')}")
-        print(f"Next run at: {nextRun.strftime('%H:%M:%S')}")
-        print(f"Waiting {wait_seconds:.1f} seconds")
-
-        while wait_seconds > 0 and self.is_running:
-            time.sleep(min(1, wait_seconds))
-            wait_seconds -= 1
-
-
-
-

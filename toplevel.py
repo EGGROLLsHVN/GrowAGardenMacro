@@ -11,11 +11,12 @@ from macro import Macro
 
 class Newlv():
     def __init__(self, window, reruns):
+        self.lock = threading.Lock()
         self.toplv = window
         self.reruns = reruns
         self.seed_vars = {}
         self.macro = None
-        self.setup_global_hotkeys()
+        # self.setup_global_hotkeys()
         # Max Columns
         self.seedMaxC = 2
         self.gearMaxC = 1
@@ -137,35 +138,41 @@ class Newlv():
         for seed in self.seeds:
             self.seed_vars[seed] = tk.BooleanVar(value=self.seeds[seed])
 
+    # Saving macro settings
         self.loadOptions()
 
     def saveOptions(self):
-        settings = {}
-        for seed in self.seeds:
-            settings[seed] = self.seed_vars[seed].get()
+        def save():
+            with self.lock:
+                settings = {}
+                for seed in self.seeds:
+                    settings[seed] = self.seed_vars[seed].get()
 
-        try:
-            with open("MacroSettings.json", "w") as file:
-                json.dump(settings, file, indent=4)  # Adds indent
-        except Exception as e:
-            print(f"Error saving settings: {e}")
+                try:
+                    with open("MacroSettings.json", "w") as file:
+                        json.dump(settings, file, indent=4)  # Adds indent
+                except Exception as e:
+                    print(f"Error saving settings: {e}")
+
+        threading.Thread(target=save, daemon=True).start()
 
     def loadOptions(self):
-        if os.path.exists("MacroSettings.json") and os.path.getsize("MacroSettings.json") > 0:
-            with open("MacroSettings.json", "r") as file:
-                settings = json.load(file)
-                
-                # Update variables from loaded settings
-                for seed in settings:
-                    if seed in self.seed_vars:
-                        self.seed_vars[seed].set(settings[seed])    # Ttinker set method
-                        self.seeds[seed] = settings[seed]           # Dictionary set method
-                
-                # Recalculate category counts
-                self.recalculateCategory()
-        else:
-            # Create a default settings file
-            self.saveOptions()
+        with self.lock:
+            if os.path.exists("MacroSettings.json") and os.path.getsize("MacroSettings.json") > 0:
+                with open("MacroSettings.json", "r") as file:
+                    settings = json.load(file)
+                    
+                    # Update variables from loaded settings
+                    for seed in settings:
+                        if seed in self.seed_vars:
+                            self.seed_vars[seed].set(settings[seed])    # Ttinker set method
+                            self.seeds[seed] = settings[seed]           # Dictionary set method
+                    
+                    # Recalculate category counts
+                    self.recalculateCategory()
+            else:
+                # Create a default settings file
+                self.saveOptions()
 
     def recalculateCategory(self):
         for category in ["SeedShop", "GearShop", "BeeShop", "EggShop"]:
@@ -175,26 +182,37 @@ class Newlv():
             if self.seeds.get(seed, False):
                 self.seeds[category] += 1
 
+    def setSeedState(self, seedName, value):
+        with self.lock:
+            self.seed_vars[seedName].set(value)
+            self.seed[seedName] = value
+            self.recalculateCategory
+
+    # 
 
     def onClose(self):
-        if self.macro is not None and self.macro.is_running:
-            self.macro.stop()
-
+        self.stopMacro()
         keyboard.unhook_all()    
         self.saveOptions()
-
-        for thread in threading.enumerate():
-            if thread != threading.current_thread():
-                thread.join(timeout=0.1)  # Try to close nicely first
     
         # Destroy the window
-        self.toplv.destroy()
-        subprocess.run(["taskkill", "/F", "/PID", str(os.getpid())], shell=True)
-        os._exit(0)
+        self.toplv.after(100, lambda: (
+            self.toplv.destroy(),
+            sys.exit(0)
+        ))
 
-    def setup_global_hotkeys(self):
-        # Bind Ctrl+2 to stopMacro
-        keyboard.add_hotkey('ctrl+2', self.stopMacroKeybind, suppress=True, timeout=0.001)
+        # self.toplv.destroy()
+        # subprocess.run(["taskkill", "/F", "/PID", str(os.getpid())], shell=True)
+        # os._exit(0)
+
+    # def setup_global_hotkeys(self):
+    #     # Bind Ctrl+2 to stopMacro
+    #     try:
+    #         keyboard.add_hotkey('ctrl+2', self.stopMacroKeybind, suppress=True, timeout=1)  
+            
+    #     except Exception as e:
+    #         print(f"Hotkey failed: {e}")  
+
 
     def newlvBuilder(self):
         toplv = self.toplv
@@ -495,37 +513,40 @@ class Newlv():
 
     # TODO: Make it update into a file so it saves the settings
     def updateSeed(self, seedName):
-        self.seeds[seedName] = self.seed_vars[seedName].get()
-        category = self.shopCategories.get(seedName)
+        with self.lock:
+            self.seeds[seedName] = self.seed_vars[seedName].get()
+            category = self.shopCategories.get(seedName)
 
-        if self.seed_vars[seedName].get() is True:
-            self.seeds[category] +=1
-        else:
-            self.seeds[category] -=1
+            if self.seed_vars[seedName].get() is True:
+                self.seeds[category] +=1
+            else:
+                self.seeds[category] -=1
 
-        # print(f"{seedName} state: {self.seeds[seedName]}") 
-        # print(f"{category} Buying: {self.seeds[category]}")
+            # print(f"{seedName} state: {self.seeds[seedName]}") 
+            # print(f"{category} Buying: {self.seeds[category]}")
 
-        self.saveOptions()
+            self.saveOptions()
 
     def startMacro(self):  
-        if self.macro is None or not self.macro.is_running:
-            self.macro = Macro(self.seeds, self.reruns)
-            self.macro.start()
-            print("Macro started")
+        with self.lock:
+            if self.macro is None or not self.macro.is_running:
+                self.macro = Macro(self.seeds.copy(), self.reruns)
+                self.macro.start()
+                print("Macro started")
 
 
     def stopMacroKeybind(self, event=None):  
         self.stopMacro()
 
     def stopMacro(self):  
-        if  self.macro is not None and self.macro.is_running:
-            self.macro.stop()
-            self.macro = None
-            # self.macro.thread.join(timeout=0.5)
-            print("Macro stopped")
-        else:
-            print("No active macro to stop")
+        with self.lock:
+            if  self.macro is not None and self.macro.is_running:
+                self.macro.stop()
+                self.macro.thread.join(timeout=1.0)
+                self.macro = None
+                print("Macro stopped")
+            else:
+                print("No active macro to stop")
 
 
 

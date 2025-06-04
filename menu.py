@@ -14,6 +14,7 @@ class Menu():
         self.tk_image = None      # Placeholder for PhotoImage reference
         self.reruns = 0
 
+    # Destroy the window
     def onClose(self):
         keyboard.unhook_all()    
         self.window.destroy()
@@ -21,11 +22,11 @@ class Menu():
             if thread != threading.current_thread():
                 thread.join(timeout=0.1)  # Try to close nicely first
     
-        # Destroy the window
-
-        subprocess.run(["taskkill", "/F", "/PID", str(os.getpid())], shell=True)
-        os._exit(0)    
-
+        try:
+            sys.exit(0)
+        except:
+            os._exit(0)  # Fallback
+            
     def guiBuilder(self):
         # Window configuration
         root = self.window
@@ -91,20 +92,19 @@ def addPlaceholder(entry, placeholder):
 # TODO: Later we may find out whats the max number of alt accounts we could pass through and limit it
 def startBtnEvent(altValue, root, menu):
     altNum = altValue.get().strip()
-    # altNum = int(altNum)
 
-    # TODO: Make it so if its none it sets to my default resolution
-    if altNum.isdigit() and int(altNum)>0:   
-        menu.reruns = int(altNum)
-        root.withdraw()
-        newWindow = Toplevel()
-        toplv = Newlv(newWindow, menu.reruns)
-        toplv.newlvBuilder()
-        
-    else:
+    if altNum == "Number of alts" or not altNum.isdigit():
         root.focus_force()
         altValue.delete(0, 'end')
         addPlaceholder(altValue, "Enter a valid number")
+        return
+      
+    menu.reruns = int(altNum)
+    root.withdraw()
+    newWindow = Toplevel()
+    toplv = Newlv(newWindow, menu.reruns)
+    toplv.newlvBuilder()
+        
       
  
         
