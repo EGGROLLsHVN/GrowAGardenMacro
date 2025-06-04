@@ -10,6 +10,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from mss import mss
 
+ctypes.windll.user32.SetProcessDPIAware()
 delay = .3
 
 class Macro():
