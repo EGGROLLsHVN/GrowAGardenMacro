@@ -638,7 +638,7 @@ class Macro():
 
         # Egg 1
         pydirectinput.keyDown("s")
-        self.safeSleep(.075)
+        self.safeSleep(.1)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
@@ -668,7 +668,7 @@ class Macro():
 
         # Egg 3
         pydirectinput.keyDown("s")
-        self.safeSleep(.075)
+        self.safeSleep(.1)
         pydirectinput.keyUp("s")
         self.safeSleep(.2)
 
